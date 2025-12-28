@@ -7,96 +7,78 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --main-pink: #ff4d6d; --dark-pink: #c9184a; --gold: #ffd700; --scan-color: #00ffcc; --christmas-green: #228B22; --christmas-red: #DC143C; }
-        * { touch-action: manipulation; box-sizing: border-box; }
-        body { margin: 0; background: radial-gradient(circle, #fff0f3 0%, #ffc1cf 100%); display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; position: relative; }
+        :root { --christmas-green: #228B22; --christmas-red: #DC143C; --gold: #ffd700; }
+        body { margin: 0; background: #fff0f3; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
+        /* تأثير الثلج */
         .snowflake { position: absolute; color: white; font-size: 20px; top: -20px; animation: fall 10s linear infinite; pointer-events: none; }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 
-        .container { width: 92%; max-width: 380px; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 40px; box-shadow: 0 20px 50px rgba(255, 77, 109, 0.2); z-index: 10; }
-        
+        .container { width: 90%; max-width: 400px; text-align: center; background: white; padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; z-index: 5; }
         .section { display: none; }
-        .active { display: block; animation: fadeIn 0.8s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
-
-        /* شجرة الكريسماس */
-        .christmas-tree { position: relative; width: 120px; height: 120px; margin: 20px auto; border: 4px dashed var(--christmas-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .inner-tree { font-size: 50px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-        /* الألبوم */
-        .album-container { width: 200px; height: 250px; margin: 15px auto; perspective: 1000px; }
-        .photo-frame { width: 100%; height: 100%; border: 5px solid white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); overflow: hidden; background: #eee; }
-        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* البصمة */
-        .fp-wrapper { position: relative; width: 100px; height: 100px; margin: 20px auto; cursor: pointer; }
-        .scan-line { position: absolute; width: 100%; height: 4px; background: var(--scan-color); top: 0; display: none; }
-        .scanning .scan-line { display: block; animation: scan 1.5s linear infinite; }
+        .fp-wrapper { width: 100px; height: 100px; margin: 20px auto; position: relative; cursor: pointer; border: 2px solid #eee; border-radius: 20px; display: flex; align-items: center; justify-content: center; }
+        .scan-line { position: absolute; width: 100%; height: 3px; background: #00ffcc; top: 0; display: none; }
+        .scanning .scan-line { display: block; animation: scan 1.5s infinite; }
         @keyframes scan { 50% { top: 100%; } }
 
-        /* الهدية */
-        .gift-box { position: relative; width: 100px; height: 100px; margin: 20px auto; cursor: pointer; }
-        .gift-box .lid { position: absolute; top: 0; width: 100%; height: 25%; background: var(--christmas-red); border: 2px solid white; z-index: 2; transition: 0.5s; }
-        .gift-box .box { position: absolute; bottom: 0; width: 100%; height: 75%; background: var(--christmas-green); border: 2px solid white; }
-        .gift-box.open .lid { transform: translateY(-50px) rotate(-10deg); opacity: 0; }
+        /* الشجرة والهدية */
+        .tree { font-size: 80px; cursor: pointer; transition: 0.3s; }
+        .tree:active { transform: scale(0.9); }
+        .gift-box { width: 100px; height: 100px; margin: 20px auto; position: relative; cursor: pointer; }
+        .gift-lid { width: 100%; height: 25%; background: var(--christmas-red); position: absolute; top: 0; transition: 0.5s; z-index: 2; border: 2px solid white; }
+        .gift-body { width: 100%; height: 75%; background: var(--christmas-green); position: absolute; bottom: 0; border: 2px solid white; }
+        .open .gift-lid { transform: translateY(-40px) rotate(-10deg); opacity: 0; }
 
-        button { background: linear-gradient(145deg, var(--christmas-red), var(--christmas-green)); color: white; border: none; padding: 15px; border-radius: 20px; width: 90%; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        
-        #black-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: white; z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        input { width: 80%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; text-align: center; }
+        button { background: var(--christmas-red); color: white; border: none; padding: 12px 25px; border-radius: 15px; cursor: pointer; font-weight: bold; }
+        #final-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; color: white; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div id="s0" class="section active">
-            <h3 style="color: var(--christmas-red)">مرحباً يا حبيبتي ❤️</h3>
-            <div class="fp-wrapper" id="fp-area" onmousedown="startScan()" onmouseup="stopScan()" ontouchstart="startScan()" ontouchend="stopScan()">
+            <h2 style="color: var(--christmas-red)">أهلاً يا حبيبتي ❤️</h2>
+            <p>اضغطي بصمتك هنا للدخول</p>
+            <div class="fp-wrapper" id="fp-box" onmousedown="startScan()" onmouseup="stopScan()" ontouchstart="startScan()" ontouchend="stopScan()">
                 <div class="scan-line"></div>
-                <div style="font-size: 80px; color: var(--christmas-red);"><i class="fas fa-fingerprint"></i></div>
+                <i class="fas fa-fingerprint" style="font-size: 60px; color: var(--christmas-red);"></i>
             </div>
-            <p>اضغطي بصمتك هنا للدخول.. ❄️</p>
         </div>
 
         <div id="s1" class="section">
-            <h3 style="color: var(--christmas-red)">أثبتي هويتك 🎅</h3>
-            <p>ما هو التاريخ المفضل لنا؟</p>
-            <input type="password" id="pw" style="width:80%; padding:10px; border-radius:10px; text-align:center;" placeholder="أدخلي السنة مثلاً">
-            <button onclick="checkPW()">دخول 🎄</button>
+            <h2 style="color: var(--christmas-red)">كلمة السر 🔐</h2>
+            <p>أدخلي سنة ذكرى مميزة لنا</p>
+            <input type="password" id="passInput" placeholder="السنة (مثلاً 2024)">
+            <br>
+            <button onclick="checkPass()">دخول ✨</button>
         </div>
 
         <div id="s2" class="section">
-            <h3 style="color: var(--christmas-red)">دوسي على الشجرة 3 مرات ✨</h3>
-            <div class="christmas-tree" onclick="treeClick()">
-                <div class="inner-tree">🎄</div>
-            </div>
-            <p id="tree-count">مرات الضغط: 0</p>
+            <h2 style="color: var(--christmas-red)">نوري الشجرة 🎄</h2>
+            <p>اضغطي عليها 3 مرات</p>
+            <div class="tree" onclick="handleTree()">🎄</div>
+            <p id="countTxt">0 / 3</p>
         </div>
 
         <div id="s3" class="section">
-            <h3 style="color: var(--christmas-red)">ذكرياتنا ❤️</h3>
-            <div class="photo-frame">
-                <img id="memory-img" src="https://via.placeholder.com/200x250?text=Photo+1" alt="ذكرى">
+            <h2 style="color: var(--christmas-red)">هدية صغيرة 🎁</h2>
+            <div class="gift-box" id="gift" onclick="openGift()">
+                <div class="gift-lid"></div>
+                <div class="gift-body"></div>
             </div>
-            <p id="photo-cap">أحلى أيامنا سوا..</p>
-            <button onclick="nextPhoto()">الصورة التالية ✨</button>
-            <button id="gift-btn" style="display:none; background: gold; color: black;" onclick="goToGift()">افتحي هديتك 🎁</button>
-        </div>
-
-        <div id="s4" class="section">
-            <h3 style="color: var(--christmas-red)">اضغطي على الصندوق 🎁</h3>
-            <div class="gift-box" id="giftBox" onclick="openGift()">
-                <div class="lid"></div>
-                <div class="box"></div>
-            </div>
+            <p>اضغطي لفتح الصندوق</p>
         </div>
     </div>
 
-    <div id="black-screen">
-        <h1 style="color: gold;">كل سنة وأنتِ طيبة ❤️</h1>
-        <p id="final-msg" style="font-size: 1.2rem;"></p>
-        <button onclick="location.reload()">إعادة من البداية 🔄</button>
+    <div id="final-screen">
+        <h1 style="color: gold;">كل سنة وأنتِ عيدي ❤️</h1>
+        <p id="typewriter" style="padding: 20px; font-size: 1.2rem;"></p>
+        <button onclick="location.reload()">أحبك ❤️</button>
     </div>
 
     <script>
@@ -110,81 +92,64 @@
             document.body.appendChild(snow);
         }
 
-        let scanTimer;
+        // منطق البصمة
+        let timer;
         function startScan() {
-            document.getElementById('fp-area').classList.add('scanning');
-            scanTimer = setTimeout(() => {
-                nextSection(1);
-            }, 2000);
+            document.getElementById('fp-box').classList.add('scanning');
+            timer = setTimeout(() => { go(1); }, 2000);
         }
         function stopScan() {
-            clearTimeout(scanTimer);
-            document.getElementById('fp-area').classList.remove('scanning');
+            clearTimeout(timer);
+            document.getElementById('fp-box').classList.remove('scanning');
         }
 
-        function checkPW() {
-            const pw = document.getElementById('pw').value;
-            if(pw === "2024") { // يمكنك تغيير كلمة السر هنا
-                nextSection(2);
+        // منطق كلمة السر
+        function checkPass() {
+            let val = document.getElementById('passInput').value;
+            if(val === "2024") { // يمكنك تغيير السنة هنا
+                go(2);
             } else {
-                alert("حاولي مرة أخرى يا روحي (تلميح: السنة الحالية)");
+                alert("خطأ! حاولي مرة أخرى يا روحي");
             }
         }
 
+        // منطق الشجرة
         let clicks = 0;
-        function treeClick() {
+        function handleTree() {
             clicks++;
-            document.getElementById('tree-count').innerText = `مرات الضغط: ${clicks}`;
-            confetti({ particleCount: 30, origin: { y: 0.7 } });
-            if(clicks >= 3) {
-                nextSection(3);
-            }
+            document.getElementById('countTxt').innerText = clicks + " / 3";
+            confetti({ particleCount: 30, origin: { y: 0.8 } });
+            if(clicks >= 3) { go(3); }
         }
 
-        let photoIndex = 0;
-        const photos = [
-            {src: "https://via.placeholder.com/200x250?text=Memory+1", cap: "أول يوم تقابلنا فيه ❤️"},
-            {src: "https://via.placeholder.com/200x250?text=Memory+2", cap: "أحلى ضحكة شفتها ✨"}
-        ];
-
-        function nextPhoto() {
-            photoIndex++;
-            if(photoIndex < photos.length) {
-                document.getElementById('memory-img').src = photos[photoIndex].src;
-                document.getElementById('photo-cap').innerText = photos[photoIndex].cap;
-            } else {
-                document.getElementById('gift-btn').style.display = "block";
-            }
-        }
-
-        function goToGift() { nextSection(4); }
-
+        // منطق الهدية
         function openGift() {
-            document.getElementById('giftBox').classList.add('open');
+            document.getElementById('gift').classList.add('open');
             confetti({ particleCount: 150, spread: 70 });
             setTimeout(() => {
-                document.getElementById('black-screen').style.display = 'flex';
-                typeWriter("أنتِ لستِ فقط حبيبتي، أنتِ عيدي وكل دنيتي.. كل عام وأنتِ بقلبي ❤️");
-            }, 1000);
+                document.getElementById('final-screen').style.display = 'flex';
+                type("أنتِ أجمل شيء حدث لي في كل السنوات.. كوني دائماً بخير وبجانبي. كريسماس سعيد يا روحي ❤️");
+            }, 800);
         }
 
-        function nextSection(id) {
+        // التنقل بين الصفحات
+        function go(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById('s'+id).classList.add('active');
         }
 
-        function typeWriter(text) {
+        // تأثير الكتابة
+        function type(txt) {
             let i = 0;
-            let target = document.getElementById('final-msg');
-            target.innerHTML = "";
-            function type() {
-                if (i < text.length) {
-                    target.innerHTML += text.charAt(i);
+            let el = document.getElementById('typewriter');
+            function step() {
+                if(i < txt.length) {
+                    el.innerHTML += txt.charAt(i);
                     i++;
-                    setTimeout(type, 100);
+                    setTimeout(step, 80);
                 }
             }
-            type();
+            step();
         }
     </script>
 </body>
